@@ -1,34 +1,30 @@
-set nocompatible              " be iMproved, required
-filetype off                  " required
-
-set rtp+=~/vimfiles/bundle/Vundle.vim
-let path='~/vimfiles/bundle'
-call vundle#begin(path)
-
-" let Vundle manage Vundle, required
-Plugin 'gmarik/Vundle.vim'
-
-"Bundle "pangloss/vim-javascript"
-Bundle 'vim-scripts/The-NERD-tree'
-"Foramt in one button press
-Bundle 'Chiel92/vim-autoformat'
-"Syntax check
-Bundle 'scrooloose/syntastic'
-"Bundle 'xolox/vim-session'
-
-call vundle#config#require(g:bundles)
-
-"set nocompatible
-"source $VIMRUNTIME/vimrc_example.vim
-"Windows like behavior
+set nocompatible
+source $VIMRUNTIME/vimrc_example.vim
 source $VIMRUNTIME/mswin.vim
 behave mswin
 
-"Misc setup without plugin required
 
-"Colors
-colorscheme desert
-set guifont=Consolas:h11:cDEFAULT
+"Use pathogen
+execute pathogen#infect()
+syntax on
+filetype plugin indent on
+
+colo codeschool
+set guifont=Monaco:h12
+let g:NERDTreeWinPos = "right"
+set guioptions-=m  "remove menu bar
+set guioptions-=T " Removes top toolbar
+set guioptions-=r " Removes right hand scroll bar
+set go-=L " Removes left hand scroll bar
+"autocmd User Rails let b:surround_{char2nr('-')} = "<% \r %>" " displays <% %> correctly
+:set cpoptions+=$ " puts a $ marker for the end of words/lines in cw/c$ commands
+
+
+"Nerdtree automatic start
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+map <C-n> :NERDTreeToggle<CR>
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 "Window Splits
 "rather than ctr+w + <movement> just to ctr+movement
@@ -37,39 +33,28 @@ map <c-k> <c-w>k
 map <c-l> <c-w>l
 map <c-h> <c-w>h
 
-"get rid of swp and ~ files
-set backupdir=$HOME\\vimtemp\\
-set directory=$HOME\\vimtemp\\
-set noundofile
-silent execute '!del "'.$VIMRUNTIME.'\temp\*~"'
+"Syntastic values
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_javascript_checkers = ['eslint']
 
-"Tabs
-autocmd Filetype html setlocal ts=2 sw=2 expandtab
-autocmd Filetype ruby setlocal ts=2 sw=2 expandtab
-autocmd Filetype javascript setlocal ts=4 sw=4 sts=0 noexpandtab
+"Personal tab settings
+autocmd Filetype html setlocal ts=2 sts=2 sw=2
+autocmd Filetype ruby setlocal ts=2 sts=2 sw=2
+autocmd Filetype javascript setlocal ts=2 sts=2 sw=2 et
 
-"Synatx Highlighting and Validation
-syntax on                           " syntax highlighing
-filetype on                          " try to detect filetypes
-filetype plugin indent on    " enable loading indent file for filetype
+"Config for command-T
+"let g:ruby_path=$RUBY_BIN
+let g:ruby_path = 'D:\Ruby200\bin'
 
-"Trim trailing space in python on save
-autocmd BufWritePre *.py :%s/\s\+$//e
-"Remove ^M on save
-"autocmd BufWritePre *.js :%s/
-"//g
-"autocmd BufWritePre *.html :%s/
-"//g
-
-
-"JS Beautify on save, didn't work so do f3
-"autocmd FileType javascript setlocal equalprg=js-beautify\ --stdin
-
-"NerdTree
-map <leader>n :NERDTreeToggle<CR>
-
-"Autoformat
-noremap <F3> :Autoformat<CR><CR>
+"No Temp files
+set noswapfile
+set nobackup
 
 set diffexpr=MyDiff()
 function MyDiff()
@@ -85,8 +70,8 @@ function MyDiff()
   let eq = ''
   if $VIMRUNTIME =~ ' '
     if &sh =~ '\<cmd'
-      let cmd = '"' . $VIMRUNTIME . '\diff"'
-      let eq = '""'
+      let cmd = '""' . $VIMRUNTIME . '\diff"'
+      let eq = '"'
     else
       let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
     endif
@@ -95,4 +80,3 @@ function MyDiff()
   endif
   silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
 endfunction
-
